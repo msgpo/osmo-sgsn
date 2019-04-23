@@ -946,6 +946,13 @@ int gprs_llc_rcvmsg(struct msgb *msg, struct tlv_parsed *tv)
 		return -EIO;
 	}
 	/* set l3 layer & remove the fcs */
+
+	/* We'll crash here sometimes because msg->data = 0 */
+	if (llhp.cmd == GPRS_LLC_NULL) {
+		LOGP(DLLC, LOGL_ERROR,
+			"Dropping llhp.cmd == GPRS_LLC_NULL (would have crashed.)\n");
+		return -EIO;
+	}
 	msg->l3h = llhp.data;
 	msgb_l3trim(msg, llhp.data_len);
 
